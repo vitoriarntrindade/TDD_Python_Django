@@ -19,7 +19,7 @@ class NewVisitorTest(unittest.TestCase):
         #Percebe que o título menciona "To-Do"
         self.browser.get('http://localhost:8000')
         self.assertIn('To-Do', self.browser.title)
-        header_text = self.browser.find_element(By.TAG_NAME,'h1').text
+        header_text = self.browser.find_element(By.TAG_NAME, 'h1').text
         self.assertIn('To-Do', header_text)
 
         #Maria é convidada a inserir um item de uma tarefa
