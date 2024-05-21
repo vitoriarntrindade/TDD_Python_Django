@@ -26,18 +26,19 @@ class NewVisitorTest(unittest.TestCase):
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertEqual(
             inputbox.get_attribute('placeholder'),
-            'Enter a to-do item'
+            'Enter a to-do item!'
         )
 
         inputbox.send_keys('Buy a new notebook')
 
         #Quando Maria clica enter, a página é atualizada, e agora pagina lista "1: buy a notebook"
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(3)
+        time.sleep(5)
 
         table = self.browser.find_element(By.ID, 'id_list_table')
         rows = table.find_element(By.TAG_NAME, 'tr')
-        self.assertTrue(any(row.text == '1: Buy a new notebook' for row in rows))
+        self.assertTrue(any(row.text == '1: Buy a new notebook' for row in rows),
+                        f'New to-do item did  not appear in table. Contents were:\n{table.text}')
 
         #Continua sendo exibida um caixa de txt a convidando para inserir outro item "to_do"
         #Ela insere "Tidy up the house"
