@@ -30,23 +30,44 @@ class NewVisitorTest(LiveServerTestCase):
                     raise e
                 time.sleep(0.5)
 
-    def test_if_can_start_a_list_and_retrieve_it_later(self):
+    def test_multiple_user_can_start_lists_at_different_urls(self):
+        #Maria ouviu falar de um app interesasnte para listar coisas
         self.browser.get(self.live_server_url)
+
+        #Maria é convidada a adicionar um item na lista de "to-do"
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
+
+        #Maria então lembra que precisa comprar um notebook
         inputbox.send_keys('buy a new notebook')
         inputbox.send_keys(Keys.ENTER)
         time.sleep(0.5)
 
+        #Maria percebeu que o item foi adicionado a lista
         self.wait_for_row_in_list_table('1: buy a new notebook')
 
-        #o usuário recebe um url único
-
+        # maria recebe um url único
         client_list_url = self.browser.current_url
-        self.assertRegex(client_list_url, '/lists/.+') #verifica se a string corresponde com a regex
-        self.browser.quit()
 
-        #simulando outro usuário acessando e sem poder ver os dados inseridos de outro usuário
+        # verifica se a string corresponde com a regex
+        self.assertRegex(client_list_url, '/lists/.+')
+        #Maria sai do site
+
+        #Agora tem Joao, um novo usuário
+        #Usamos um outra sessão para Joao não ver os dados de Maria
+        self.browser.quit()
         self.browser = webdriver.Firefox()
+
+        #Joao acessa e não vê nenhum sinal da lista de Maria
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
         self.assertNotIn('1: buy a new notebook', page_text)
+
+        #Joao inicia uma nova lista, inserindo um novo item
+
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        inputbox.send_keys('Aula de artes marciais')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(0.5)
+
+        # Joao percebeu que o item foi adicionado a lista
+        self.wait_for_row_in_list_table('1: Aula de artes marciais')
