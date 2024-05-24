@@ -43,13 +43,12 @@ class NewVisitorTest(LiveServerTestCase):
         time.sleep(3)
 
         #Maria percebeu que o item foi adicionado a lista
-        self.wait_for_row_in_list_table('1: buy a new notebook')
+        self.wait_for_row_in_list_table('buy a new notebook')
 
         # maria recebe um url único
         maria_list_url = self.browser.current_url
 
         # verifica se a string corresponde com a regex
-        print("assertregex")
         self.assertRegex(maria_list_url, '/lists/.+')
         #Maria sai do site
 
@@ -61,8 +60,8 @@ class NewVisitorTest(LiveServerTestCase):
         #Joao acessa e não vê nenhum sinal da lista de Maria
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
-        print("assert notin ")
-        self.assertNotIn('1: buy a new notebook', page_text)
+
+        self.assertNotIn('buy a new notebook', page_text)
 
         #Joao inicia uma nova lista, inserindo um novo item
 
@@ -72,7 +71,7 @@ class NewVisitorTest(LiveServerTestCase):
         time.sleep(0.5)
 
         #Joao percebeu que o item foi adicionado a lista
-        self.wait_for_row_in_list_table('1: Aula de artes marciais')
+        self.wait_for_row_in_list_table('Aula de artes marciais')
         time.sleep(5)
         #Joao obtem seu proprio url
 
@@ -82,5 +81,26 @@ class NewVisitorTest(LiveServerTestCase):
 
         #Não há nenhum registro da lista de maria exposto ao joao
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
-        self.assertNotIn('1: buy a new notebook', page_text)
-        self.assertIn("1: Aula de artes marciais", page_text)
+        self.assertNotIn('buy a new notebook', page_text)
+        self.assertIn("Aula de artes marciais", page_text)
+
+
+    def test_layout_and_styling(self):
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        #Maria percebe que a caixa de entrada esta elegantemente centralizada
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        inputbox.send_keys('testando')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('testando')
+
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            5120,
+            delta=10
+        )
+
+
+
+
