@@ -40,16 +40,17 @@ class NewVisitorTest(LiveServerTestCase):
         #Maria então lembra que precisa comprar um notebook
         inputbox.send_keys('buy a new notebook')
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(0.5)
+        time.sleep(3)
 
         #Maria percebeu que o item foi adicionado a lista
         self.wait_for_row_in_list_table('1: buy a new notebook')
 
         # maria recebe um url único
-        client_list_url = self.browser.current_url
+        maria_list_url = self.browser.current_url
 
         # verifica se a string corresponde com a regex
-        self.assertRegex(client_list_url, '/lists/.+')
+        print("assertregex")
+        self.assertRegex(maria_list_url, '/lists/.+')
         #Maria sai do site
 
         #Agora tem Joao, um novo usuário
@@ -60,6 +61,7 @@ class NewVisitorTest(LiveServerTestCase):
         #Joao acessa e não vê nenhum sinal da lista de Maria
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
+        print("assert notin ")
         self.assertNotIn('1: buy a new notebook', page_text)
 
         #Joao inicia uma nova lista, inserindo um novo item
@@ -69,5 +71,16 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(0.5)
 
-        # Joao percebeu que o item foi adicionado a lista
+        #Joao percebeu que o item foi adicionado a lista
         self.wait_for_row_in_list_table('1: Aula de artes marciais')
+        time.sleep(5)
+        #Joao obtem seu proprio url
+
+        joao_list_url = self.browser.current_url
+        self.assertRegex(joao_list_url, '/lists/.+')
+        self.assertNotEquals(joao_list_url, maria_list_url)
+
+        #Não há nenhum registro da lista de maria exposto ao joao
+        page_text = self.browser.find_element(By.TAG_NAME, 'body').text
+        self.assertNotIn('1: buy a new notebook', page_text)
+        self.assertIn("1: Aula de artes marciais", page_text)
